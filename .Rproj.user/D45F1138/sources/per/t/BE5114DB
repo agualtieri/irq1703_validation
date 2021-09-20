@@ -1,0 +1,32 @@
+{
+    "id": "BE5114DB",
+    "path": null,
+    "project_path": null,
+    "type": "r_dataframe",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1610464757196.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "expression": "issues",
+        "caption": "issues",
+        "totalObservations": 13,
+        "displayedObservations": 13,
+        "variables": 5,
+        "cacheKey": "39EA8270",
+        "object": "issues",
+        "environment": "",
+        "contentUrl": "grid_resource/gridviewer.html?env=&obj=issues&cache_key=39EA8270&max_cols=50",
+        "preview": 0
+    },
+    "folds": "",
+    "lastKnownWriteTime": 8319104478871053584,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1610464757196,
+    "read_only": false,
+    "read_only_alternatives": []
+}

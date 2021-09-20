@@ -1,0 +1,755 @@
+
+tredb <- read.table("TRE_sociodemo_2580.csv", sep=";", header=TRUE, quote="", na.strings="")
+tredb
+
+
+#Library
+library("readr")
+library("xlsx")
+library("dplyr")
+library("knitr")
+library("rmarkdown")
+library("ggplot2")
+library("forcats")
+library("summarytools")
+library("xlsx")
+
+#collapse régions de résidence
+tredb$resideeu <- fct_collapse(tredb$reside, "EU" = c("FR", "IT", "D"))
+tredb$residena <- fct_collapse(tredb$reside, "NA" = c("CA", "USA"))
+tredb$residegulf <- fct_collapse(tredb$reside, "GULF" = c("Q8", "AR", "QAT","EAU"))
+
+# sous-groupes
+eu <-filter(tredb, tredb$reside2== "EU")
+eu
+nam <-filter(tredb, tredb$reside2== "NAM")
+nam
+gulf <-filter(tredb, tredb$reside2== "GULF")
+gulf
+
+#PARTIE 1_Profil socio-démographique
+# De quelle région de Tunisie sont-ils originaires les travailleurs TRE?
+regioTREall<- freq(tredb$regio_TRE)
+regioTREall
+
+write.xlsx(regioTREall, file ="analysisTRE1.xlsx", sheet="Sheet1", append=FALSE) 
+
+#Résidez-vous actuellement dans un des pays suivants?
+resideall<-freq(tredb$reside)
+write.xlsx(resideall, file ="analysisTRE1.xlsx", sheet="Sheet2", append=TRUE)
+
+res_AR2<-freq(tredb$res_AR)
+res_QAT2<-freq(tredb$res_QAT)
+res_Q82<-freq(tredb$res_Q8)
+res_EAU2<-freq(tredb$res_EAU)
+res_FR2<-freq(tredb$res_FR)
+res_D2<-freq(tredb$res_D)
+res_IT2<-freq(tredb$res_IT)
+res_CA2<-freq(tredb$res_CA)
+res_USA2<-freq(tredb$res_USA)
+
+#Dans quelle région d'Allemagne vivez-vous actuellement? 
+#Dans quelle région de France vivez-vous actuellement?
+#Dans quelle province ou territoire du Canada vivez-vous actuellement?
+#Dans quel état des Etats-Unis vivez-vous actuellement?
+#Dans quelle province d'Arabie Saoudite vivez-vous actuellement?
+#Dans quelle province des Emirats Arabes Unis vivez-vous actuellement?
+#Dans quelle région du Qatar vivez-vous actuellement ?
+#Dans quelle région du Koweït vivez-vous actuellement ?
+
+write.xlsx(res_AR2, file ="analysisTRE1.xlsx", sheet="Sheet3", append=TRUE)
+write.xlsx(res_QAT2, file ="analysisTRE1.xlsx", sheet="Sheet4", append=TRUE)
+write.xlsx(res_Q82, file ="analysisTRE1.xlsx", sheet="Sheet5", append=TRUE)
+write.xlsx(res_EAU2, file ="analysisTRE1.xlsx", sheet="Sheet6", append=TRUE)
+write.xlsx(res_FR2, file ="analysisTRE1.xlsx", sheet="Sheet7", append=TRUE)
+write.xlsx(res_D2, file ="analysisTRE1.xlsx", sheet="Sheet8", append=TRUE)
+write.xlsx(res_IT2, file ="analysisTRE1.xlsx", sheet="Sheet9", append=TRUE)
+write.xlsx(res_CA2, file ="analysisTRE1.xlsx", sheet="Sheet10", append=TRUE)
+write.xlsx(res_USA2, file ="analysisTRE1.xlsx", sheet="Sheet11", append=TRUE)
+
+#Genre des travailleurs TRE
+sexall<-freq(tredb$sex)
+sexall
+write.xlsx(sexall, file ="analysisTRE1.xlsx", sheet="Sheet12", append=TRUE)
+
+
+##Genre des travailleurs TRE, par région de résidence
+sex_regio<-table(tredb$sex,reside20)
+sex_regio
+write.xlsx(sex_regio, file ="analysisTRE1.xlsx", sheet="Sheet13", append=TRUE)
+
+# Quel âge avez-vous?
+ageall<-freq(tredb$age)
+write.xlsx(ageall, file ="analysisTRE1.xlsx", sheet="Sheet14", append=TRUE)
+
+age_regio<-table(tredb$age,reside2)
+age_regio
+write.xlsx(age_regio, file ="analysisTRE1.xlsx", sheet="Sheet15", append=TRUE)
+
+#Quel est le niveau d'éducation que vous avez terminé?
+eduall<-freq(tredb$edu)
+write.xlsx(eduall, file ="analysisTRE1.xlsx", sheet="Sheet16", append=TRUE)
+
+eduregio<-table (reside2, tredb$edu)
+eduregio
+
+write.xlsx(eduregio, file ="analysisTRE1.xlsx", sheet="Sheet17", append=TRUE)
+
+#Où se trouve votre famille nucléaire ?
+family_where_all<-freq(tredb$family_where)
+write.xlsx(family_where_all, file ="analysisTRE1.xlsx", sheet="Sheet18", append=TRUE)
+
+familywhereregio<- table (reside2, tredb$family_where)
+write.xlsx(familywhereregio, file ="analysisTRE1.xlsx", sheet="Sheet19", append=TRUE)
+
+#Depuis combien d'années vivez-vous dans ce pays?
+howlongall<-freq(tredb$how_long)
+howlongall
+write.xlsx(howlongall, file ="analysisTRE1.xlsx", sheet="Sheet20", append=TRUE)
+
+##tredb_how_long as factor
+tredb$how_long
+how_longfac<-as.factor(tredb$how_long)
+how_longfac
+
+##regrouper tredb_how_long > howlong2
+
+how_long2 <-fct_collapse(tredb$how_longfac, "born_here"="born_here", "1year_less=1year_less", "1-2"=c("1","2"),"3-4"=c("3","4"),"5-7"=c("5","6","7"),"8-10"=c("8","9","10"), "11-15"=c("11", "12", "13", "14", "15"), "16-20"=c("16", "17", "18", "19", "20"), "20-30"=c("21","22","23","24","25","26","27","28","29","30"), "31-40"=c("31","32","33","34","35","36","37","38","39","40"), "41-50"=c("41","42","43","44","45","46","47","48","49","50"), "51-60"=c("51","52","53","54","55","56","57","58","59","60"), "61-70"=c("61","62","63","64","65","66","67","68","69","70"),"71-80"=c("71","72","73","74","75","76","77","78","79","80"), "dwta"="dwta")
+howlongall2<-freq(how_long2)
+howlongall2
+write.xlsx(howlongall2, file ="analysisTRE1.xlsx", sheet="Sheet23", append=TRUE)
+
+howlongall2regio<-table (reside2, tredb$how_long2)
+howlongall2regio
+write.xlsx(howlongall2regio, file ="analysisTRE1.xlsx", sheet="Sheet24", append=TRUE)
+
+
+#Etiez-vous dans ce pays déjà avant que la crise de COVID-19 ne commence?
+##TRE all
+alreadyhereall<-freq(tredb$already_here)
+write.xlsx(alreadyhereall, file ="analysisTRE1.xlsx", sheet="Sheet21", append=TRUE)
+
+alreadyhereregio <- table(reside2, tredb$already_here)
+write.xlsx(alreadyhereregio, file ="analysisTRE1.xlsx", sheet="Sheet22", append=TRUE)
+
+
+
+
+#****
+#PARTIE 2: CONDITIONS SOCIO-ECONOMIQUES
+
+setwd("C:/Users/franc/OneDrive/Documents/01_Employment and Education/00_Projects and contracts/IMPACT_ILO/18AQA/03_Data analysis/Database_TRE/2_economic_1630")
+tredb2 <- read.table("TREsocioec1630.csv", sep=";", header=TRUE, quote="", na.strings="")
+tredb2
+#Library
+library("readr")
+library("xlsx")
+library("dplyr")
+library("knitr")
+library("rmarkdown")
+library("ggplot2")
+library("forcats")
+library("summarytools")
+library("xlsx")
+
+# De quelle région de Tunisie sont-ils originaires les travailleurs TRE?
+regioTREallp2<- freq(tredb2$regio_TRE)
+regioTREallp2
+write.xlsx(regioTREallp2, file ="analysisTRE2.xlsx", sheet="Sheet1", append=FALSE) 
+
+#Résidez-vous actuellement dans un des pays suivants?
+resideallp2<-freq(tredb2$reside)
+write.xlsx(resideallp2, file ="analysisTRE2.xlsx", sheet="Sheet2", append=TRUE)
+
+res_AR2p2<-freq(tredb2$res_AR)
+res_QAT2p2<-freq(tredb2$res_QAT)
+res_Q82p2<-freq(tredb2$res_Q8)
+res_EAU2p2<-freq(tredb2$res_EAU)
+res_FR2p2<-freq(tredb2$res_FR)
+res_D2p2<-freq(tredb2$res_D)
+res_IT2p2<-freq(tredb2$res_IT)
+res_CA2p2<-freq(tredb2$res_CA)
+res_USA2p2<-freq(tredb2$res_USA)
+
+#regrouper et créer un nouveau reside2p2
+residep2<-table(tredb2$reside)
+reside2p2<-fct_collapse(tredb2$reside, "EU" = c("FR", "IT", "D"),"NAM" = c("CA", "USA"),"GULF" = c("BE", "Q8", "AR", "QAT","EAU"),"other"=c("UK","JOR","LUX","other","ES"))
+table(reside2p2)
+reside2p2
+
+#Dans quelle région d'Allemagne vivez-vous actuellement? 
+#Dans quelle région de France vivez-vous actuellement?
+#Dans quelle province ou territoire du Canada vivez-vous actuellement?
+#Dans quel état des Etats-Unis vivez-vous actuellement?
+#Dans quelle province d'Arabie Saoudite vivez-vous actuellement?
+#Dans quelle province des Emirats Arabes Unis vivez-vous actuellement?
+#Dans quelle région du Qatar vivez-vous actuellement ?
+#Dans quelle région du Koweït vivez-vous actuellement ?
+
+write.xlsx(res_AR2p2, file ="analysisTRE2.xlsx", sheet="Sheet3", append=TRUE)
+write.xlsx(res_QAT2p2, file ="analysisTRE2.xlsx", sheet="Sheet4", append=TRUE)
+write.xlsx(res_Q82p2, file ="analysisTRE2.xlsx", sheet="Sheet5", append=TRUE)
+write.xlsx(res_EAU2p2, file ="analysisTRE2.xlsx", sheet="Sheet6", append=TRUE)
+write.xlsx(res_FR2p2, file ="analysisTRE2.xlsx", sheet="Sheet7", append=TRUE)
+write.xlsx(res_D2p2, file ="analysisTRE2.xlsx", sheet="Sheet8", append=TRUE)
+write.xlsx(res_IT2p2, file ="analysisTRE2.xlsx", sheet="Sheet9", append=TRUE)
+write.xlsx(res_CA2p2, file ="analysisTRE2.xlsx", sheet="Sheet10", append=TRUE)
+write.xlsx(res_USA2p2, file ="analysisTRE2.xlsx", sheet="Sheet11", append=TRUE)
+
+#Genre des travailleurs TRE
+sexallp2<-freq(tredb2$sex)
+sexallp2
+write.xlsx(sexallp2, file ="analysisTRE2.xlsx", sheet="Sheet12", append=TRUE)
+
+sex_regiop2<-table(tredb2$sex,reside2p2)
+sex_regiop2
+
+sex_regioprop<-prop.table(table(tredb2$sex,reside2p2))*100
+sex_regioprop
+write.xlsx(sex_regiop2, file ="analysisTRE2.xlsx", sheet="Sheet13", append=TRUE)
+write.xlsx(sex_regioprop, file ="analysisTRE2.xlsx", sheet="Sheet14", append=TRUE)
+
+# Quel âge avez-vous?
+ageallp2<-freq(tredb2$age)
+write.xlsx(ageallp2, file ="analysisTRE2.xlsx", sheet="Sheet15", append=TRUE)
+
+age_regiop2<-table(tredb2$age,reside2p2)
+age_regiop2
+write.xlsx(age_regiop2, file ="analysisTRE2.xlsx", sheet="Sheet16", append=TRUE)
+
+#Quel est le niveau d'éducation que vous avez terminé?
+eduallp2<-freq(tredb2$edu)
+write.xlsx(eduallp2, file ="analysisTRE2.xlsx", sheet="Sheet17", append=TRUE)
+
+eduregiop2<-table (reside2p2, tredb2$edu)
+eduregiop2
+write.xlsx(eduregiop2, file ="analysisTRE2.xlsx", sheet="Sheet18", append=TRUE)
+
+#Où se trouve votre famille nucléaire ?
+family_where_allp2<-freq(tredb2$family_where)
+write.xlsx(family_where_allp2, file ="analysisTRE2.xlsx", sheet="Sheet19", append=TRUE)
+
+familywhereregiop2<- table (reside2p2, tredb2$family_where)
+write.xlsx(familywhereregiop2, file ="analysisTRE2.xlsx", sheet="Sheet20", append=TRUE)
+
+#Depuis combien d'années vivez-vous dans ce pays?
+howlongallp2<-freq(tredb2$how_long)
+howlongallp2
+write.xlsx(howlongallp2, file ="analysisTRE2.xlsx", sheet="Sheet21", append=TRUE)
+
+##tredb_how_long as factor
+library("forcats")
+how_longfacp2<-as.factor(tredb2$how_long)
+how_longfacp2
+class(how_longfacp2)
+##regrouper tredb_how_long > howlong2
+
+
+how_long2p2 <-fct_collapse(how_longfacp2, "born_here"="born_here", "1year_less=1year_less", "1-2"=c("1","2"),"3-4"=c("3","4"),"5-7"=c("5","6","7"),"8-10"=c("8","9","10"), "11-15"=c("11", "12", "13", "14", "15"), "16-20"=c("16", "17", "18", "19", "20"), "20-30"=c("21","22","23","24","25","26","27","28","29","30"), "31-40"=c("31","32","33","34","35","36","37","38","39","40"), "41-50"=c("41","42","43","44","45","46","47","48","49","50"), "51-60"=c("51","52","53","54","55","56","57","58","59","60"), "61-70"=c("61","62","63","64","65","66","67","68","69","70"),"71-80"=c("71","72","73","74","75","76","77","78","79","80"), "dwta"="dwta")
+
+howlongall2p2<-freq(how_long2p2)
+howlongall2p2
+write.xlsx(howlongall2p2, file ="analysisTRE2.xlsx", sheet="Sheet22", append=TRUE)
+
+howlongregiop2<-table(reside2p2, tredb2$how_long2p2)
+howlongregiop2
+write.xlsx(howlongaregiop2, file ="analysisTRE2.xlsx", sheet="Sheet23", append=TRUE)
+
+
+#Etiez-vous dans ce pays déjà avant que la crise de COVID-19 ne commence?
+##TRE all
+alreadyhereallp2<-freq(tredb2$already_here)
+write.xlsx(alreadyhereallp2, file ="analysisTRE2.xlsx", sheet="Sheet24", append=TRUE)
+
+alreadyhereregiop2 <- table(reside2p2, tredb2$already_here)
+write.xlsx(alreadyhereregiop2, file ="analysisTRE2.xlsx", sheet="Sheet25", append=TRUE)
+
+#"Dans quel secteur d'emploi travaillez-vous habituellement ? 
+worksectallp2<-freq(tredb2$work_sect)
+write.xlsx(worksectallp2, file ="analysisTRE2.xlsx", sheet="Sheet26", append=TRUE)
+
+worksectregiop2 <-table(tredb2$work_sect,reside2p2)
+worksectregiop2
+write.xlsx(worksectregiop2, file ="analysisTRE2.xlsx", sheet="Sheet27", append=TRUE)
+
+#"Quel était votre régime de travail habituel (avant la crise de la Covid 19)?
+contrtypeallp2<-freq(tredb2$contr_type)
+contrtypeallp2
+write.xlsx(contrtypeallp2, file ="analysisTRE2.xlsx", sheet="28", append=TRUE)
+
+contrtyperegiop2 <-table(tredb2$contr_type,reside2p2)
+contrtyperegiop2
+write.xlsx(contrtyperegiop2, file ="analysisTRE2.xlsx", sheet="Sheet29", append=TRUE)
+
+#Quel est votre régime de travail actuel?
+contrtypenowallp2<-freq(tredb2$contr_type_now)
+contrtypenowallp2
+write.xlsx(contrtypenowallp2, file ="analysisTRE2.xlsx", sheet="Sheet30", append=TRUE)
+
+contrtypenowregiop2<-table(tredb2$contr_type_now,reside2p2)
+contrtypenowregiop2
+write.xlsx(contrtypenowregiop2, file ="analysisTRE2.xlsx", sheet="Sheet31", append=TRUE)
+
+#La Covid-19 a-t-elle eu un impact négatif sur votre état de santé? 
+View(tredb2)
+multresp_health<-data.frame(Freq = colSums(tredb2[35:43]),
+                       Pct.of.Resp = (colSums(tredb2[35:43])/sum(tredb2[35:43]))*100,
+                       Pct.of.Cases = (colSums(tredb2[35:43])/nrow(tredb2[35:43]))*100)
+multresp_health
+write.xlsx(multresp_health, file ="analysisTRE2.xlsx", sheet="Sheet32", append=TRUE)
+
+
+#Olivier modified this v
+#mutate/regrouper "reside" in fewer levels
+# reside3<-tredb2 %>% 
+#   mutate(reside3 = fct_collapse(tredb2$reside,
+#                                 "EU" = c("IT","FR","D"),
+#                                 "GULF"= c("QAT", "EAU", "AR", "Q8"),
+#                                 "NAM" = c("CA","USA"),
+#                                 "Autres pays"= c("other","ES","BE","LUX","UK","JOR")
+#   )) %>%
+#   pull(reside3) %>% 
+#   levels()
+# reside3
+
+
+tredb2<-tredb2 %>% 
+  mutate(reside3 = fct_collapse(tredb2$reside,
+                                "EU" = c("IT","FR","D"),
+                                "GULF"= c("QAT", "EAU", "AR", "Q8"),
+                                "NAM" = c("CA","USA"),
+                                "Autres pays"= c("other","ES","BE","LUX","UK","JOR")))
+#Olivier modified this ^
+
+getfreq<-function(var,data){
+  df<-table(data[[var]]) %>% as.data.frame 
+  names(df)[1]<-"var_x_level"
+  df$perc<-df$Freq/sum(df$Freq)
+  df$var_x<-var
+  return(df)
+}
+
+crosstab<-function(var,disa,data){
+  lapply(unique(data[[disa]]),function(x,var,data,disa){
+    dt<-data[data[[disa]]==x,]
+    df<-getfreq(var,dt)
+    df$var_disa<-disa
+    df$var_disa_level<-x
+    return(df)
+  },data=data,var=var,disa=disa) %>% bind_rows
+}
+
+
+mresp_health_regio<-lapply(c("no_pbm_health",	"cov_short",	"cov_long",	"mental_health",	"drugs",	"no_will",	"anxiety",	"insomn",	"other_health",	"dwta_health"),function(y,disa,data){
+  crosstab(y,disa,data)
+},disa="reside3",data=tredb2
+) %>% bind_rows
+
+write.xlsx(mresp_health_regio, file ="analysisTRE2.xlsx", sheet="Sheet33", append=TRUE)
+
+#La COVID-19 a-t-elle eu un impact négatif sur votre situation professionnelle dans ce pays?
+View(tredb2)
+
+multresp_work<-data.frame(Freq = colSums(tredb2[47:57]),
+                            Pct.of.Resp = (colSums(tredb2[4:57])/sum(tredb2[47:57]))*100,
+                            Pct.of.Cases = (colSums(tredb2[47:57])/nrow(tredb2[47:57]))*100)
+multresp_work
+write.xlsx(multresp_work, file ="analysisTRE2.xlsx", sheet="Sheet34", append=TRUE)
+
+#regio
+getfreq<-function(var,data){
+  df<-table(data[[var]]) %>% as.data.frame 
+  names(df)[1]<-"var_x_level"
+  df$perc<-df$Freq/sum(df$Freq)
+  df$var_x<-var
+  return(df)
+}
+
+crosstab<-function(var,disa,data){
+  lapply(unique(data[[disa]]),function(x,var,data,disa){
+    dt<-data[data[[disa]]==x,]
+    df<-getfreq(var,dt)
+    df$var_disa<-disa
+    df$var_disa_level<-x
+    return(df)
+  },data=data,var=var,disa=disa) %>% bind_rows
+}
+
+mresp_work_regio<-lapply(c("no_pbm_work","job_loss","part_time","cov_paid","cov_unpaid","garde","paid_less","job_change","sect_change","other_work","dwta_work"
+),function(y,disa,data){
+  crosstab(y,disa,data)
+},disa="reside3",data=tredb2
+) %>% bind_rows
+
+write.xlsx(mresp_work_regio, file ="analysisTRE2.xlsx", sheet="Sheet35", append=TRUE)
+
+
+#"La Covid-19 a-t-elle eu un impact négatif sur votre situation socio-économique et administrative dans ce pays?
+View(tredb2)
+multresp_socio<-data.frame(Freq = colSums(tredb2[60:67]),
+                          Pct.of.Resp = (colSums(tredb2[60:67])/sum(tredb2[60:67]))*100,
+                          Pct.of.Cases = (colSums(tredb2[60:67])/nrow(tredb2[60:67]))*100)
+multresp_socio
+write.xlsx(multresp_socio, file ="analysisTRE2.xlsx", sheet="Sheet36", append=TRUE)
+
+#regio
+getfreq<-function(var,data){
+  df<-table(data[[var]]) %>% as.data.frame 
+  names(df)[1]<-"var_x_level"
+  df$perc<-df$Freq/sum(df$Freq)
+  df$var_x<-var
+  return(df)
+}
+
+crosstab<-function(var,disa,data){
+  lapply(unique(data[[disa]]),function(x,var,data,disa){
+    dt<-data[data[[disa]]==x,]
+    df<-getfreq(var,dt)
+    df$var_disa<-disa
+    df$var_disa_level<-x
+    return(df)
+  },data=data,var=var,disa=disa) %>% bind_rows
+}
+
+mresp_socio_regio<-lapply(c("no_pbm_socio","permit_admin","other_permit","evict","evict_risk","move_out","other_socio","dwta_socio"
+),function(y,disa,data){
+  crosstab(y,disa,data)
+},disa="reside3",data=tredb2
+) %>% bind_rows
+
+write.xlsx(mresp_socio_regio, file ="analysisTRE2.xlsx", sheet="Sheet37", append=TRUE)
+
+#"Avant la crise de la COVID-19, quel était votre revenu moyen net par mois ? (en monnaie locale)
+incomebefall<-freq(tredb2$income_bef)
+incomebefall
+write.xlsx(incomebefall, file ="analysisTRE2.xlsx", sheet="Sheet38", append=TRUE)
+incomebefregiop2<-table(tredb2$income_bef, reside2p2)
+incomebefregio
+write.xlsx(incomebefregio, file ="analysisTRE2.xlsx", sheet="Sheet39", append=TRUE)
+#Depuis la crise de COVID-19, gagnez-vous:
+incomesinceall<-freq(tredb2$income_since)
+incomesinceall
+write.xlsx(incomesinceall, file ="analysisTRE2.xlsx", sheet="Sheet40", append=TRUE)
+incomesinceregio<-table(tredb2$income_since, reside2p2)
+incomesinceregio
+write.xlsx(incomesinceregio, file ="analysisTRE2.xlsx", sheet="Sheet41", append=TRUE)
+
+#"Avant la crise de COVID-19 : combien de personnes dans votre foyer (hormis vous) dépendaient de vous comme source principale de revenus?"
+hh_befall<-freq(tredb2$hh_bef)
+hh_befall
+write.xlsx(hh_befall, file ="analysisTRE2.xlsx", sheet="Sheet42", append=TRUE)
+
+hh_befregio<-table(tredb2$hh_bef, reside2p2)
+hh_befregio
+write.xlsx(hh_befregio, file ="analysisTRE2.xlsx", sheet="Sheet43", append=TRUE)
+
+#"A l'heure actuelle, combien de personnes dans votre foyer (hormis vous) dépendent de vous comme source principale de revenus ?"
+View(tredb2)
+hh_nowall<-freq(tredb2$hh_after)
+hh_nowall
+write.xlsx(hh_nowall, file ="analysisTRE2.xlsx", sheet="Sheet44", append=TRUE)
+
+hh_nowregio<-table(tredb2$hh_after, reside2p2)
+hh_nowregio
+write.xlsx(hh_nowregio, file ="analysisTRE2.xlsx", sheet="Sheet45", append=TRUE)
+
+#"Avant la pandémie de COVID-19, quelle proportion (%)de votre salaire épargniez-vous (en moyenne, par mois)?"
+save_befall<-freq(tredb2$save_bef)
+save_befall
+write.xlsx(save_befall, file ="analysisTRE2.xlsx", sheet="Sheet46", append=TRUE)
+
+save_befregio<-table(tredb2$save_bef, reside2p2)
+save_befregio
+write.xlsx(save_befregio, file ="analysisTRE2.xlsx", sheet="Sheet47", append=TRUE)
+
+#A l’heure actuelle, quelle proportion de votre salaire épargnez-vous en moyenne, par mois?
+save_nowall<-freq(tredb2$save_now)
+save_nowall
+write.xlsx(save_nowall, file ="analysisTRE2.xlsx", sheet="Sheet48", append=TRUE)
+
+save_nowregio<-table(tredb2$save_now, reside2p2)
+save_nowregio
+write.xlsx(save_nowregio, file ="analysisTRE2.xlsx", sheet="Sheet49", append=TRUE)
+
+#"Depuis la crise de la COVID-19, la proportion de prêts divers que vous remboursez (sur le total de vos revenus mensuels), a-t-elle augmenté? 
+loans_sinceall<-freq(tredb2$loans_since)
+loans_sinceall
+write.xlsx(loans_sinceall, file ="analysisTRE2.xlsx", sheet="Sheet50", append=TRUE)
+
+loans_sinceregio<-table(tredb2$loans_since, reside2p2)
+loans_sinceregio
+write.xlsx(loans_sinceregio, file ="analysisTRE2.xlsx", sheet="Sheet70", append=TRUE)
+
+#Avant la pandémie de COVID-19, quelle proportion de votre salaire envoyiez-vous en Tunisie, en moyenne, par mois?
+remit_befall<-freq(tredb2$remit_bef)
+remit_befall
+write.xlsx(remit_befall, file ="analysisTRE2.xlsx", sheet="Sheet51", append=TRUE)
+
+remit_befregio<-table(tredb2$remit_bef, reside2p2)
+remit_befregio
+write.xlsx(remit_befregio, file ="analysisTRE2.xlsx", sheet="Sheet52", append=TRUE)
+
+#A l'heure actuelle, quelle proportion (%) de votre salaire envoyez-vous en moyenne, par mois en Tunisie
+remit_sinceall<-freq(tredb2$remit_since)
+remit_sinceall
+write.xlsx(remit_sinceall, file ="analysisTRE2.xlsx", sheet="Sheet53", append=TRUE)
+
+remit_sinceregio<-table(tredb2$remit_since, reside2p2)
+remit_sinceregio
+write.xlsx(remit_sinceregio, file ="analysisTRE2.xlsx", sheet="Sheet54", append=TRUE)
+
+#A quel but? - Selected Choice
+remit_whyall<-freq(tredb2$remit_why)
+remit_whyall
+write.xlsx(remit_whyall, file ="analysisTRE2.xlsx", sheet="Sheet55", append=TRUE)
+
+remit_whyregio<-table(tredb2$remit_why, reside2p2)
+remit_whyregio
+write.xlsx(remit_whyregio, file ="analysisTRE2.xlsx", sheet="Sheet56", append=TRUE)
+
+#Avant l'apparition du COVID-19, auxquelles des mesures de sécurité sociale suivantes aviez-vous accès dans le pays où vous vous trouvez actuellement? - Selected Choice
+View(tredb2)
+multresp_socprotbef<-data.frame(Freq = colSums(tredb2[88:95]),
+                           Pct.of.Resp = (colSums(tredb2[88:95])/sum(tredb2[88:95]))*100,
+                           Pct.of.Cases = (colSums(tredb2[88:95])/nrow(tredb2[88:95]))*100)
+multresp_socprotbef
+write.xlsx(multresp_socprotbef, file ="analysisTRE2.xlsx", sheet="Sheet57", append=TRUE)
+
+#multresp_socprotbefregio
+getfreq<-function(var,data){
+  df<-table(data[[var]]) %>% as.data.frame 
+  names(df)[1]<-"var_x_level"
+  df$perc<-df$Freq/sum(df$Freq)
+  df$var_x<-var
+  return(df)
+}
+
+crosstab<-function(var,disa,data){
+  lapply(unique(data[[disa]]),function(x,var,data,disa){
+    dt<-data[data[[disa]]==x,]
+    df<-getfreq(var,dt)
+    df$var_disa<-disa
+    df$var_disa_level<-x
+    return(df)
+  },data=data,var=var,disa=disa) %>% bind_rows
+}
+
+multresp_socprotregio<-lapply(c("unempl","soc_sec","basic_health","pension_fund","fam_allocate","other_soc_protect","none","dwta_soc_protect"),function(y,disa,data){
+  crosstab(y,disa,data)
+},disa="reside3",data=tredb2
+) %>% bind_rows
+
+write.xlsx(multresp_socprotregio, file ="analysisTRE2.xlsx", sheet="Sheet99", append=TRUE)
+
+
+
+#"Auxquelles des mesures de sécurité sociale suivantes avez-vous accès dans le pays où vous vous  trouvez actuellement?
+
+socprotnow<-na.omit(tredb2[98:105])
+
+multresp_socprotnow<-data.frame(Freq = colSums(socprotnow),
+                             Pct.of.Resp = (colSums(socprotnow)/sum(socprotnow)*100),
+                             Pct.of.Cases = (colSums(socprotnow)/nrow(socprotnow)*100)
+)
+multresp_socprotnow
+write.xlsx(multresp_socprotnow, file ="analysisTRE2.xlsx", sheet="Sheet58", append=TRUE)
+
+#multresp_socprotnowregio
+
+getfreq<-function(var,data){
+  df<-table(data[[var]]) %>% as.data.frame 
+  names(df)[1]<-"var_x_level"
+  df$perc<-df$Freq/sum(df$Freq)
+  df$var_x<-var
+  return(df)
+}
+
+crosstab<-function(var,disa,data){
+  lapply(unique(data[[disa]]),function(x,var,data,disa){
+    dt<-data[data[[disa]]==x,]
+    df<-getfreq(var,dt)
+    df$var_disa<-disa
+    df$var_disa_level<-x
+    return(df)
+  },data=data,var=var,disa=disa) %>% bind_rows
+}
+
+multresp_socprotnowregio<-lapply(c("unempl_now","soc_sec_now","basic_health_now","pension_fund_now","fam_allocate_now","other_soc_protect_now","none_now","dwta_soc_protect_now"),function(y,disa,data){
+  crosstab(y,disa,data)
+},disa="reside3",data=tredb2
+) %>% bind_rows
+
+multresp_socprotnowregio
+write.xlsx(multresp_socprotnowregio, file ="analysisTRE2.xlsx", sheet="Sheet100", append=TRUE)
+
+
+
+#"Si vous n'avez plus d'accès à aucune des mesures ci-dessus, pouvez-vous préciser pourquoi?"
+multresp_nmprotectwhy<-data.frame(Freq = colSums(tredb2[108:113]),
+                                Pct.of.Resp = (colSums(tredb2[108:113])/sum(tredb2[108:113]))*100,
+                                Pct.of.Cases = (colSums(tredb2[108:113])/nrow(tredb2[108:113]))*100)
+multresp_nmprotectwhy
+write.xlsx(multresp_nmprotectwhy, file ="analysisTRE2.xlsx", sheet="Sheet59", append=TRUE)
+
+#multresp_nmsocprotwhyregio
+
+getfreq<-function(var,data){
+  df<-table(data[[var]]) %>% as.data.frame 
+  names(df)[1]<-"var_x_level"
+  df$perc<-df$Freq/sum(df$Freq)
+  df$var_x<-var
+  return(df)
+}
+
+crosstab<-function(var,disa,data){
+  lapply(unique(data[[disa]]),function(x,var,data,disa){
+    dt<-data[data[[disa]]==x,]
+    df<-getfreq(var,dt)
+    df$var_disa<-disa
+    df$var_disa_level<-x
+    return(df)
+  },data=data,var=var,disa=disa) %>% bind_rows
+}
+
+multresp_nmsocprotwhyregio<-lapply(c("still_access","job_loss_cov","permit_couldntgo","other_soc_protect_why","idk_soc_protect_why","dwta_soc_protect_why"),function(y,disa,data){
+  crosstab(y,disa,data)
+},disa="reside3",data=tredb2
+) %>% bind_rows
+
+multresp_nmsocprotwhyregio
+write.xlsx(multresp_nmsocprotwhyregio, file ="analysisTRE2.xlsx", sheet="Sheet101", append=TRUE)
+
+
+
+#"Si vous n'avez pas d'accès à aucune des mesures ci-dessus, pouvez-vous préciser pourquoi? 
+multresp_noprotectwhy<-data.frame(Freq = colSums(tredb2[116:121]),
+                                  Pct.of.Resp = (colSums(tredb2[116:121])/sum(tredb2[116:121]))*100,
+                                  Pct.of.Cases = (colSums(tredb2[116:121])/nrow(tredb2[116:121]))*100)
+multresp_noprotectwhy
+write.xlsx(multresp_noprotectwhy, file ="analysisTRE2.xlsx", sheet="Sheet60", append=TRUE)
+
+#multresp_nosocprotwhyregio
+getfreq<-function(var,data){
+  df<-table(data[[var]]) %>% as.data.frame 
+  names(df)[1]<-"var_x_level"
+  df$perc<-df$Freq/sum(df$Freq)
+  df$var_x<-var
+  return(df)
+}
+
+crosstab<-function(var,disa,data){
+  lapply(unique(data[[disa]]),function(x,var,data,disa){
+    dt<-data[data[[disa]]==x,]
+    df<-getfreq(var,dt)
+    df$var_disa<-disa
+    df$var_disa_level<-x
+    return(df)
+  },data=data,var=var,disa=disa) %>% bind_rows
+}
+
+multresp_nosocprotwhyregio<-lapply(c("have_access","job_loss_cov2","permit_couldntgo2","other_soc_protect_why2","idk_soc_protect_why2","dwta_soc_protect_why2"),function(y,disa,data){
+  crosstab(y,disa,data)
+},disa="reside3",data=tredb2
+) %>% bind_rows
+
+multresp_nosocprotwhyregio
+write.xlsx(multresp_nosocprotwhyregio, file ="analysisTRE2.xlsx", sheet="Sheet102", append=TRUE)
+
+#PARTIE3 IMPACT sur LA MOBILITE
+#La COVID-19 a-t-elle eu un impact sur vos projets de mobilité future (de rester ici, partir pour la Tunisie ou ailleurs)? 
+impactmoveall<-freq(tredb2$impact_move)
+impactmoveall
+write.xlsx(impactmoveall, file ="analysisTRE2.xlsx", sheet="Sheet61", append=TRUE)
+
+impact_moveregio<-table(tredb2$impact_move, reside2p2)
+impact_moveregio
+write.xlsx(impact_moveregio, file ="analysisTRE2.xlsx", sheet="Sheet62", append=TRUE)
+
+#>>>>>>"Quelles sont les raisons principales de ce changement de décision? Modified
+View(tredb2)
+movewhy<-na.omit(tredb2[126:132])
+multresp_move_why<-data.frame(Freq = colSums(movewhy),
+                                  Pct.of.Resp = (colSums(movewhy)/sum(movewhy))*100,
+                                  Pct.of.Cases = (colSums(movewhy)/nrow(movewhy))*100)
+multresp_move_why
+write.xlsx(multresp_move_why, file ="analysisTRE2.xlsx", sheet="Sheet63", append=TRUE)
+
+
+#mrespmovewhyregio
+getfreq<-function(var,data){
+  df<-table(data[[var]]) %>% as.data.frame 
+  names(df)[1]<-"var_x_level"
+  df$perc<-df$Freq/sum(df$Freq)
+  df$var_x<-var
+  return(df)
+}
+
+crosstab<-function(var,disa,data){
+  lapply(unique(data[[disa]]),function(x,var,data,disa){
+    dt<-data[data[[disa]]==x,]
+    df<-getfreq(var,dt)
+    df$var_disa<-disa
+    df$var_disa_level<-x
+    return(df)
+  },data=data,var=var,disa=disa) %>% bind_rows
+}
+
+
+mrespmovewhyregio<-lapply(c("ctr_dest_fewer_opp", "want_to_be_closer","ctr_dest_insecure","soc_services_better_elsewhere","health_services_better_elsewhere","other_impact_move_why","dwta_impact_move_why"),function(y,disa,data){
+  crosstab(y,disa,data)
+},disa="reside3",data=tredb2
+) %>% bind_rows
+
+write.xlsx(mrespmovewhyregio, file ="analysisTRE2.xlsx", sheet="Sheet64",append=TRUE)
+
+#"Quelles sont les raisons principales de ce changement de décision? Modified
+View(tredb2)
+stay_why<-na.omit(tredb2[135:141])
+multresp_stay_why<-data.frame(Freq = colSums(stay_why),
+                                Pct.of.Resp = (colSums(stay_why)/sum(stay_why))*100,
+                                Pct.of.Cases = (colSums(stay_why)/nrow(stay_why))*100)
+
+multresp_stay_why
+write.xlsx(multresp_stay_why, file ="analysisTRE2.xlsx", sheet="Sheet65", append=TRUE)
+
+#mrespstaywhyregio
+getfreq<-function(var,data){
+  df<-table(data[[var]]) %>% as.data.frame 
+  names(df)[1]<-"var_x_level"
+  df$perc<-df$Freq/sum(df$Freq)
+  df$var_x<-var
+  return(df)
+}
+
+crosstab<-function(var,disa,data){
+  lapply(unique(data[[disa]]),function(x,var,data,disa){
+    dt<-data[data[[disa]]==x,]
+    df<-getfreq(var,dt)
+    df$var_disa<-disa
+    df$var_disa_level<-x
+    return(df)
+  },data=data,var=var,disa=disa) %>% bind_rows
+}
+
+mrespstaywhyregio<-lapply(c("stay_longer_save","stay_longer_perso","feeling_safe_here","health_better_here","soc_serv_here","other_stay_why","dwta_why"),function(y,disa,data){
+  crosstab(y,disa,data)
+},disa="reside3",data=tredb2
+) %>% bind_rows
+
+mrespstaywhyregio
+
+write.xlsx(mrespstaywhyregio, file ="analysisTRE2.xlsx", sheet="Sheet103",append=TRUE)
+
+#"Si vous souhaitez partir vers un autre pays, dans quels délais envisagez-vous de le faire?"
+away_whenall<-freq(tredb2$away_when)
+away_whenall
+write.xlsx(away_whenall, file ="analysisTRE2.xlsx", sheet="Sheet67", append=TRUE)
+
+#Si vous souhaitez retourner vers votre pays d’origine, dans quels délais envisagez-vous faire cela?
+return_whenall<-freq(tredb2$return_when)
+return_whenall
+write.xlsx(return_whenall, file ="analysisTRE2.xlsx", sheet="Sheet68", append=TRUE)
+
+
+
+

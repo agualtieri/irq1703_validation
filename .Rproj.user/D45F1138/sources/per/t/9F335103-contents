@@ -1,0 +1,17 @@
+rm(list=ls())
+
+library(openxlsx)
+library(tidyverse)
+library(cleaninginspectoR)
+
+## load data
+df <- read.xlsx("./input/IRQ_Dataset_Joint Price Monitoring Initiative (JPMI)_November 2020.xlsx", sheet = "Data")
+log <- read.xlsx("./input/IRQ_Dataset_Joint Price Monitoring Initiative (JPMI)_November 2020.xlsx", sheet = "Cleaning Log")
+
+## inspector
+issues <- inspect_all(df)
+
+print(df$`Retailer_Data/sanitary_napkins_price`)
+min(df$`Retailer_Data/sanitary_napkins_price`)
+
+
